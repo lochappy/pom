@@ -66,6 +66,10 @@ int main(int argc, char **argv) {
     input_stream = configuration_file;
   } else input_stream = &cin;
 
+
+//  configuration_file = new ifstream("test.pom");
+//  input_stream = configuration_file;
+
   char input_view_format[buffer_size] = "";
   char result_format[buffer_size] = "";
   char result_view_format[buffer_size] = "";
