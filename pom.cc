@@ -47,28 +47,28 @@ int main(int argc, char **argv) {
   ifstream *configuration_file = 0;
   istream *input_stream;
 
-  if(argc > 1) {
-    if(strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
-      cout << argv[0] << " [-h | --help | <configuration file>]" << endl
-           << endl
-           << "  If a configuration file name is provided, the program processes it" << endl
-           << "  and prints information about the files it generates. Otherwise, it" << endl
-           << "  reads the standard input and does not produce any printout on the" << endl
-           << "  standard output unless an error occurs." << endl
-           << endl;
-      exit(0);
-    }
-    configuration_file = new ifstream(argv[1]);
-    if(configuration_file->fail()) {
-      cerr << "Can not open " << argv[1] << " for reading." << endl;
-      exit(1);
-    }
-    input_stream = configuration_file;
-  } else input_stream = &cin;
+//  if(argc > 1) {
+//    if(strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
+//      cout << argv[0] << " [-h | --help | <configuration file>]" << endl
+//           << endl
+//           << "  If a configuration file name is provided, the program processes it" << endl
+//           << "  and prints information about the files it generates. Otherwise, it" << endl
+//           << "  reads the standard input and does not produce any printout on the" << endl
+//           << "  standard output unless an error occurs." << endl
+//           << endl;
+//      exit(0);
+//    }
+//    configuration_file = new ifstream(argv[1]);
+//    if(configuration_file->fail()) {
+//      cerr << "Can not open " << argv[1] << " for reading." << endl;
+//      exit(1);
+//    }
+//    input_stream = configuration_file;
+//  } else input_stream = &cin;
 
 
-//  configuration_file = new ifstream("test.pom");
-//  input_stream = configuration_file;
+  configuration_file = new ifstream("test.pom");
+  input_stream = configuration_file;
 
   char input_view_format[buffer_size] = "";
   char result_format[buffer_size] = "";

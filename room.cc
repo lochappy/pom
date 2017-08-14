@@ -65,7 +65,7 @@ void Room::save_stochastic_view(char *name,
     scalar_t r, g, b;
     scalar_t a = proba_pixel_off(px, py);
 
-    if(dots(px, py)) { r = 0.0; g = 0.0; b = 0.0; }
+    if(dots(px, py)) { r = 1.0; g = 0.0; b = 0.0; }
     else {
       if(a < 0.5) { r = 0; g = 0; b = 2*a; }
       else        { r = (a - 0.5) * 2; g = (a - 0.5) * 2; b = 1.0; }

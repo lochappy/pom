@@ -4,7 +4,10 @@
 # The images are of resolution 160x120, there are two cameras and 1332
 # locations of interest
 
-ROOM 160 120 2 1332
+ROOM -1 -1 2 1332
+
+CAMERA 0 160 120
+CAMERA 1 160 120
 
 # The rectangles modeling silhouettes for every camera and location
 
@@ -2679,16 +2682,16 @@ INPUT_VIEW_FORMAT images/view-f%f-c%c.png
 
 # Where to save the "average synthetic views"
 
-RESULT_VIEW_FORMAT /tmp/result-f%f-c%c.png
+RESULT_VIEW_FORMAT result/result-f%f-c%c.png
 
 # Where to save the maps of marginal probabilities
 
-RESULT_FORMAT /tmp/proba-f%f.dat
+RESULT_FORMAT result/proba-f%f.dat
 
 # Where to save the images for every iteration of the estimation
 # process
 
-# CONVERGENCE_VIEW_FORMAT /tmp/convergence-f%f-c%c-i%i.png
+CONVERGENCE_VIEW_FORMAT result/convergence-f%f-c%c-i%i.png
 
 # To speed-up the convergence, the solver ignores locations when the
 # probability of absence is greater than 0.99
