@@ -17,9 +17,13 @@
 // Contact <pom@epfl.ch> for comments & bug reports                             //
 //////////////////////////////////////////////////////////////////////////////////
 
+#include "opencv2/opencv.hpp"
 class Rectangle {
 public:
   bool visible;
   int xmin, ymin, xmax, ymax;
+  cv::Rect getCvRect(){ return cv::Rect(xmin, ymin,getWidth(),getHeight());}
+  int getWidth(){ return xmax-xmin;}
+  int getHeight(){ return ymax-ymin;}
   Rectangle();
 };

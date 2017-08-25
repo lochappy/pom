@@ -23,12 +23,17 @@
 #include "misc.h"
 #include "array.h"
 #include "rgb_image.h"
+#include "opencv2/opencv.hpp"
 
 class ProbaView : public Array<scalar_t> {
 public:
   ProbaView(int view_width, int view_height);
 
   void from_image(const RGBImage *picture);
+  cv::Mat getCvMat(){
+      cv::Mat tmp(width,height,CV_64FC1,content);
+      return tmp.t();
+  }
 
   inline void fill(const scalar_t &t) {
     register scalar_t *s = content;

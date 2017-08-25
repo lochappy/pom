@@ -24,6 +24,7 @@
 #include "rectangle.h"
 #include "proba_view.h"
 #include "vector.h"
+#include "opencv2/opencv.hpp"
 
 using namespace std;
 
@@ -45,6 +46,12 @@ public:
   inline int view_width(int n_camera) const { return _proba_views[n_camera]->get_width(); }
   inline int view_height(int n_camera) const { return _proba_views[n_camera]->get_height(); }
   inline ProbaView *get_view(int n_camera) const { return _proba_views[n_camera]; }
+  inline cv::Mat get_view_CVMat(int n_camera) const {
+//      cv::Mat room_view = _proba_views[n_camera]->getCvMat();
+//      cv::imshow("room_view",room_view);
+//      cv::waitKey();
+      return _proba_views[n_camera]->getCvMat();
+  }
 
   inline Rectangle *avatar(int n_camera, int n_position) const {
     ASSERT(n_camera >= 0 && n_camera < _nb_cameras &&

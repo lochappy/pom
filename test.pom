@@ -2691,7 +2691,7 @@ RESULT_FORMAT result/proba-f%f.dat
 # Where to save the images for every iteration of the estimation
 # process
 
-CONVERGENCE_VIEW_FORMAT result/convergence-f%f-c%c-i%i.png
+#CONVERGENCE_VIEW_FORMAT result/convergence-f%f-c%c-i%i.png
 
 # To speed-up the convergence, the solver ignores locations when the
 # probability of absence is greater than 0.99

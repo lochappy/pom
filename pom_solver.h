@@ -26,29 +26,33 @@
 #include "normal_law.h"
 #include "room.h"
 #include "vector.h"
+#include "opencv2/opencv.hpp"
 
 class POMSolver {
 
   // At each pixel the proba for the pixel to be off
 
-  Vector<ProbaView *> neg;
+  //Vector<ProbaView *> neg;
+  std::vector< cv::Mat> vNegs;
 
   // At each pixel, 0 if the view is 0, and the proba for the pixel to
   // be off if the view is 1 (or, more mathematically: neg * view)
 
-  Vector<ProbaView *> neg_view;
+  //Vector<ProbaView *> neg_view;
 
   // Integral images to speed-up computation
 
-  Vector<IntegralProbaView *> ii_neg;
-  Vector<IntegralProbaView *> ii_neg_view;
+  //Vector<IntegralProbaView *> ii_neg;
+  std::vector< IntegralImage> vIINegs;
+  //Vector<IntegralProbaView *> ii_neg_view;
+  std::vector< IntegralImage> vIINegView;
 
   // Distribution of surface_difference / surface_synthetic
 
   NormalLaw global_difference;
 
-  void compute_average_images(int camera,
-                              Room *room,
+  void compute_average_images(const int camera,
+                              const Room *room,
                               Vector<scalar_t> *proba_absence);
 
   // Adds to every sum[i] the value log(P(X_i = 1 | V_camera) / P(X_i
@@ -62,8 +66,6 @@ class POMSolver {
 public:
 
   POMSolver(Room *room);
-
-  ~POMSolver();
 
   // Uses the computation above for the various cameras and the prior
   // to refresh proba_absence. Iterates as many times as

@@ -22,10 +22,16 @@
 
 #include "proba_view.h"
 #include "integral_array.h"
+#include "opencv2/opencv.hpp"
 
 class IntegralProbaView : public IntegralArray<scalar_t> {
 public:
-  IntegralProbaView(int view_width, int view_height) : IntegralArray<scalar_t>(view_width, view_height) {};
+  IntegralProbaView(int view_width, int view_height) : IntegralArray<scalar_t>(view_width, view_height) {}
+
+  cv::Mat getCvMat(){
+      cv::Mat tmp(width,height,CV_64FC1,content);
+      return tmp.t();
+  }
 
   // Computes the integral image and returns the sum of all the
   // original image pixels
@@ -72,4 +78,54 @@ public:
     return st;
   }
 };
+
+
+class IntegralImage{
+public:
+
+//    IntegralImage(int iW,int iH){
+//        mIntegral.create(iH+1,iW+1,CV_64FC1);
+//    }
+    IntegralImage(){}
+
+    double compute_sum(cv::Mat &m){
+        cv::Mat m_tmp;
+        m.convertTo(m_tmp,CV_64FC1);
+        cv::integral(m_tmp,mIntegral);
+        return mIntegral.at<double>(mIntegral.rows-1,mIntegral.cols-1);
+    }
+
+    // Computes the integral image and returns the sum of (2m-1)*b
+    double compute_sum(const cv::Mat &m, const cv::Mat &b){
+        cv::Mat m_tmp, b_tmp, m_by_b;
+        m.convertTo(m_tmp,CV_64FC1);
+        b.convertTo(b_tmp,CV_64FC1);
+
+        cv::multiply(m_tmp,b_tmp,m_by_b);
+        cv::integral(m_by_b,mIntegral);
+
+        cv::Scalar sum_b = cv::sum(b);
+
+        return (2*mIntegral.at<double>(mIntegral.rows-1,mIntegral.cols-1)-sum_b.val[0]);
+    }
+    cv::Mat getIntegralImage(){return mIntegral;}
+
+
+    // Integral on xmin <= x < xmax, ymin <= y < ymax
+    // Thus, xmax and ymax can go up to m->width+1 and m->height+1 respectively
+
+    inline double integral(int xmin, int ymin, int xmax, int ymax) const {
+      ASSERT(xmin <= xmax && ymin <= ymax, "Inconsistent bounds for integral");
+      ASSERT(xmin >= 0 && xmax < mIntegral.cols &&
+             ymin >= 0 && ymax < mIntegral.rows, "Index out of bounds in IntegralImage()");
+      return mIntegral.at<double>(ymax,xmax) + mIntegral.at<double>(ymin,xmin)
+             -mIntegral.at<double>(ymin,xmax) -mIntegral.at<double>(ymax,xmin);
+//      return Array<T>::heads[xmax][ymax] + Array<T>::heads[xmin][ymin]
+//        - Array<T>::heads[xmax][ymin] - Array<T>::heads[xmin][ymax];
+    }
+
+private:
+    cv::Mat mIntegral;
+};
+
 #endif

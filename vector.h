@@ -34,6 +34,7 @@ protected:
   int size;
   T *content;
 public:
+  inline T *data(){return content;}
   inline void resize(int s) {
     delete[] content;
     size = s;
