@@ -16,7 +16,8 @@
 // (C) Ecole Polytechnique Federale de Lausanne                                 //
 // Contact <pom@epfl.ch> for comments & bug reports                             //
 //////////////////////////////////////////////////////////////////////////////////
-
+#ifndef Rectangle_H
+#define Rectangle_H
 #include "opencv2/opencv.hpp"
 class Rectangle {
 public:
@@ -27,3 +28,5 @@ public:
   int getHeight(){ return ymax-ymin;}
   Rectangle();
 };
+
+#endif // Rectangle_H

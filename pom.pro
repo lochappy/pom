@@ -26,7 +26,8 @@ SOURCES += \
     rectangle.cc \
     rgb_image.cc \
     room.cc \
-    IntegralImage.cc
+    IntegralImage.cc \
+    Camera.cc
 
 OTHER_FILES += \
     gpl-3.0.txt \
@@ -46,7 +47,8 @@ HEADERS += \
     rgb_image.h \
     room.h \
     vector.h \
-    IntegralImage.h
+    IntegralImage.h \
+    Camera.h
 
 LIBS += -lm -lpng
 LIBS += -lopencv_calib3d \

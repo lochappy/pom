@@ -30,34 +30,6 @@
 
 class POMSolver {
 
-  // At each pixel the proba for the pixel to be off
-  std::vector< cv::Mat> vNegs;
-
-  // At each pixel, 0 if the view is 0, and the proba for the pixel to
-  // be off if the view is 1 (or, more mathematically: neg * view)
-
-  //Vector<ProbaView *> neg_view;
-
-  // Integral images to speed-up computation
-  std::vector< IntegralImage> vIINegs;
-  std::vector< IntegralImage> vIINegView;
-
-  // Distribution of surface_difference / surface_synthetic
-
-  NormalLaw global_difference;
-
-  void compute_average_images(const int camera,
-                              const Room *room,
-                              const cv::Mat &proba_absence);
-
-  // Adds to every sum[i] the value log(P(X_i = 1 | V_camera) / P(X_i
-  // = 0 | V_camera)), given the other P(X_j = 1 | V)
-
-  void add_log_ratio(const int camera,
-                     const Room *room,
-                     const cv::Mat &proba_absence,
-                     cv::Mat &sum);
-
 public:
 
   POMSolver(Room *room);

@@ -287,35 +287,36 @@ int main(int argc, char **argv) {
         exit(1);
       }
 
-      Rectangle *current = room->avatar(n_camera, n_position);
+      Rectangle current;// = room->avatar(n_camera, n_position);
 
       check_parameter(s, line_number, buffer);
       s = next_word(token, s, buffer_size);
       if(strcmp(token, "notvisible") == 0) {
-        current->visible = false;
-        current->xmin = -1;
-        current->ymin = -1;
-        current->xmax = -1;
-        current->ymax = -1;
+        current.visible = false;
+        current.xmin = -1;
+        current.ymin = -1;
+        current.xmax = -1;
+        current.ymax = -1;
       } else {
-        current->visible = true;
-        current->xmin = atoi(token);
+        current.visible = true;
+        current.xmin = atoi(token);
         check_parameter(s, line_number, buffer);
         s = next_word(token, s, buffer_size);
-        current->ymin = atoi(token);
+        current.ymin = atoi(token);
         check_parameter(s, line_number, buffer);
         s = next_word(token, s, buffer_size);
-        current->xmax = atoi(token);
+        current.xmax = atoi(token);
         check_parameter(s, line_number, buffer);
         s = next_word(token, s, buffer_size);
-        current->ymax = atoi(token);
+        current.ymax = atoi(token);
 
-        if(current->xmin < 0 || current->xmax >= room->view_width(n_camera) ||
-           current->ymin < 0 || current->ymax >= room->view_height(n_camera)) {
+        if(current.xmin < 0 || current.xmax >= room->view_width(n_camera) ||
+           current.ymin < 0 || current.ymax >= room->view_height(n_camera)) {
           cerr << "Rectangle out of bounds, line " << line_number << endl;
           exit(1);
         }
       }
+      room->setRectangle(n_camera, n_position,current);
     }
 
     else if(strcmp(token, "PRIOR") == 0) {

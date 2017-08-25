@@ -25,6 +25,7 @@
 #include "proba_view.h"
 #include "vector.h"
 #include "opencv2/opencv.hpp"
+#include "Camera.h"
 
 using namespace std;
 
@@ -34,12 +35,13 @@ class Room {
 
   Vector<ProbaView *> _proba_views;
 
-  Rectangle *_rectangles;
-
 public:
 
   Room(int nb_cameras, int nb_positions, Vector<ProbaView *> proba_views);
   ~Room();
+  std::vector< Camera > vCams;
+
+  void setRectangle(const int camera_id, const int position, const Rectangle rect);
 
   inline int nb_positions() const { return _nb_positions; }
   inline int nb_cameras() const { return _nb_cameras; }
@@ -53,11 +55,11 @@ public:
       return _proba_views[n_camera]->getCvMat();
   }
 
-  inline Rectangle *avatar(int n_camera, int n_position) const {
+  inline Rectangle avatar(int n_camera, int n_position) const {
     ASSERT(n_camera >= 0 && n_camera < _nb_cameras &&
            n_position >= 0 && n_position < _nb_positions,
            "Index out of bounds");
-    return _rectangles + n_camera * _nb_positions + n_position;
+    return vCams[n_camera].vRects[n_position];
   }
 
   void save_stochastic_view(char *name, int ncam, const Vector<scalar_t> *proba_presence) const;

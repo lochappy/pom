@@ -27,11 +27,20 @@ Room::Room(int nb_cameras, int nb_positions, Vector<ProbaView *> proba_views) {
   _proba_views = proba_views;
   _nb_cameras = nb_cameras;
   _nb_positions = nb_positions;
-  _rectangles = new Rectangle[_nb_cameras * _nb_positions];
+  vCams.clear();
+  for(int i=0;i<nb_cameras;i++)
+    vCams.push_back(Camera(nb_positions,proba_views[i]));
 }
 
 Room::~Room() {
-  delete[] _rectangles;
+}
+
+void Room::setRectangle(const int camera_id, const int position, const Rectangle rect)
+{
+    ASSERT(camera_id >= 0 && camera_id < _nb_cameras && position >= 0 && position < _nb_positions,
+           "Index out of bounds");
+    vCams[camera_id].setRectangle(position,rect);
+
 }
 
 void Room::save_stochastic_view(char *name,
@@ -51,13 +60,13 @@ void Room::save_stochastic_view(char *name,
   dots.clear();
 
   for(int n = 0; n < nb_positions(); n++) {
-    Rectangle *r = avatar(n_camera, n);
-    if(r->visible) {
-      for(int py = r->ymin; py < r->ymax; py++)
-        for(int px = r->xmin; px < r->xmax; px++)
+    const Rectangle r = avatar(n_camera, n);
+    if(r.visible) {
+      for(int py = r.ymin; py < r.ymax; py++)
+        for(int px = r.xmin; px < r.xmax; px++)
           proba_pixel_off(px, py) *= (1 - (*proba_presence)[n]);
-      if(r->xmin > 0 && r->xmax < view_width-1 && r->ymax < view_height-1)
-        dots((r->xmax + r->xmin)/2, r->ymax) = true;
+      if(r.xmin > 0 && r.xmax < view_width-1 && r.ymax < view_height-1)
+        dots((r.xmax + r.xmin)/2, r.ymax) = true;
     }
   }
 
