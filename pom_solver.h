@@ -22,17 +22,15 @@
 #define POM_SOLVER_H
 
 #include "misc.h"
-#include "integral_proba_view.h"
 #include "normal_law.h"
 #include "room.h"
 #include "vector.h"
 #include "opencv2/opencv.hpp"
+#include "IntegralImage.h"
 
 class POMSolver {
 
   // At each pixel the proba for the pixel to be off
-
-  //Vector<ProbaView *> neg;
   std::vector< cv::Mat> vNegs;
 
   // At each pixel, 0 if the view is 0, and the proba for the pixel to
@@ -41,10 +39,7 @@ class POMSolver {
   //Vector<ProbaView *> neg_view;
 
   // Integral images to speed-up computation
-
-  //Vector<IntegralProbaView *> ii_neg;
   std::vector< IntegralImage> vIINegs;
-  //Vector<IntegralProbaView *> ii_neg_view;
   std::vector< IntegralImage> vIINegView;
 
   // Distribution of surface_difference / surface_synthetic
@@ -53,15 +48,15 @@ class POMSolver {
 
   void compute_average_images(const int camera,
                               const Room *room,
-                              Vector<scalar_t> *proba_absence);
+                              const cv::Mat &proba_absence);
 
   // Adds to every sum[i] the value log(P(X_i = 1 | V_camera) / P(X_i
   // = 0 | V_camera)), given the other P(X_j = 1 | V)
 
-  void add_log_ratio(int camera,
-                     Room *room,
-                     Vector<scalar_t> *proba_absence,
-                     Vector<scalar_t> *sum);
+  void add_log_ratio(const int camera,
+                     const Room *room,
+                     const cv::Mat &proba_absence,
+                     cv::Mat &sum);
 
 public:
 

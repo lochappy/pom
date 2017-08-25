@@ -25,7 +25,8 @@ SOURCES += \
     proba_view.cc \
     rectangle.cc \
     rgb_image.cc \
-    room.cc
+    room.cc \
+    IntegralImage.cc
 
 OTHER_FILES += \
     gpl-3.0.txt \
@@ -37,8 +38,6 @@ OTHER_FILES += \
 HEADERS += \
     array.h \
     global.h \
-    integral_array.h \
-    integral_proba_view.h \
     misc.h \
     normal_law.h \
     pom_solver.h \
@@ -46,7 +45,8 @@ HEADERS += \
     rectangle.h \
     rgb_image.h \
     room.h \
-    vector.h
+    vector.h \
+    IntegralImage.h
 
 LIBS += -lm -lpng
 LIBS += -lopencv_calib3d \

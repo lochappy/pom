@@ -42,26 +42,21 @@ POMSolver::POMSolver(Room *room)
 
 //////////////////////////////////////////////////////////////////////
 
-void POMSolver::compute_average_images(const int camera,
-                                       const Room *room,
-                                       Vector<scalar_t> *proba_absence) {
-
+void POMSolver::compute_average_images(const int camera, const Room *room, const cv::Mat &proba_absence)
+{
     vNegs[camera].setTo(1.0);
-    for(int n = 0; n < room->nb_positions(); n++) if((*proba_absence)[n] <= global_proba_ignored) {
+    const double *proba_absence_ptr = (const double*)proba_absence.data;
+    for(int n = 0; n < room->nb_positions(); n++) if(proba_absence_ptr[n] <= global_proba_ignored) {
         Rectangle *r = room->avatar(camera, n);
         if(r->visible)
-            vNegs[camera](cv::Rect(r->xmin, r->ymin, r->getWidth()+1,r->getHeight()+1)) *= (*proba_absence)[n];
+            vNegs[camera](cv::Rect(r->xmin, r->ymin, r->getWidth()+1,r->getHeight()+1)) *= proba_absence_ptr[n];
     }
-
 }
 
 //////////////////////////////////////////////////////////////////////
 
-void POMSolver::add_log_ratio(int camera,
-                              Room *room,
-                              Vector<scalar_t> *proba_absence,
-                              Vector<scalar_t> *sum) {
-
+void POMSolver::add_log_ratio(const int camera, const Room *room, const cv::Mat &proba_absence, cv::Mat &sum)
+{
     // Computes the average on the complete picture
 
     compute_average_images(camera, room, proba_absence);
@@ -79,7 +74,7 @@ void POMSolver::add_log_ratio(int camera,
     for(int i = 0; i < room->nb_positions(); i++) {
         Rectangle *r = room->avatar(camera, i);
         if(r->visible) {
-            const scalar_t lambda = 1 - 1/(*proba_absence)[i];
+            const scalar_t lambda = 1 - 1/proba_absence.at<double>(0,i);
 
             const scalar_t integral_neg =   vIINegs[camera].integral(r->xmin, r->ymin, r->xmax + 1, r->ymax + 1);
 
@@ -94,74 +89,11 @@ void POMSolver::add_log_ratio(int camera,
             const scalar_t log_mu0 = global_difference.log_proba(average_diff_givabs / average_surface_givabs);
             const scalar_t log_mu1 = global_difference.log_proba(average_diff_givpre / average_surface_givpre);
 
-            (*sum)[i] += log_mu1 - log_mu0;
+            sum.at<double>(0,i) += log_mu1 - log_mu0;
 
         }
     }
 }
-
-//void POMSolver::add_log_ratio(int camera,
-//                              Room *room,
-//                              Vector<scalar_t> *proba_absence,
-//                              Vector<scalar_t> *sum) {
-
-//    // Computes the average on the complete picture
-
-//    compute_average_images(camera, room, proba_absence);
-
-//    double s = ii_neg[camera]->compute_sum(neg[camera]);
-//    double s_cv = vIINegs[camera].compute_sum(vNegs[camera]);
-////    {//Small test by lochappy
-////    cv::Scalar s_diff = cv::sum(cv::abs(ii_neg[camera]->getCvMat() - vIINegs[camera].getIntegralImage()));
-////    std::cout << "s_diff = " << s_diff.val[0] <<std::endl;
-////    }
-
-//    double sv = ii_neg_view[camera]->compute_sum(neg[camera], room->get_view(camera));
-//    double sv_cv = vIINegView[camera].compute_sum(vNegs[camera], room->get_view_CVMat(camera));
-
-////    {//Small test by lochappy
-////    cv::Scalar sv_diff = cv::sum(cv::abs(ii_neg_view[camera]->getCvMat() - vIINegView[camera].getIntegralImage()));
-////    std::cout << "sv_diff = " << sv_diff.val[0] <<std::endl;
-////    }
-
-
-//    scalar_t noise_proba = 0.01; // 1% of the scene can remain unexplained
-//    scalar_t average_surface = room->view_width(camera) * room->view_height(camera) * (1 + noise_proba) - s;
-//    scalar_t average_diff = average_surface + sv;
-
-//    // Cycles throw all positions and adds the log likelihood ratio to
-//    // the total sum for each
-
-//    for(int i = 0; i < room->nb_positions(); i++) {
-//        Rectangle *r = room->avatar(camera, i);
-//        if(r->visible) {
-//            scalar_t lambda = 1 - 1/(*proba_absence)[i];
-
-//            scalar_t integral_neg = ii_neg[camera]->integral(r->xmin, r->ymin, r->xmax + 1, r->ymax + 1);
-//            scalar_t integral_neg_cv = vIINegs[camera].integral(r->xmin, r->ymin, r->xmax + 1, r->ymax + 1);
-//            {//Small test by lochappy
-//                std::cout << "integral_neg_diff = " << std::abs(integral_neg_cv - integral_neg) <<std::endl;
-//            }
-
-//            scalar_t average_surface_givpre = average_surface +          integral_neg;
-//            scalar_t average_surface_givabs = average_surface + lambda * integral_neg;
-
-//            scalar_t integral_neg_view = ii_neg_view[camera]->integral(r->xmin, r->ymin, r->xmax + 1, r->ymax + 1);
-//            scalar_t integral_neg_view_cv = vIINegView[camera].integral(r->xmin, r->ymin, r->xmax + 1, r->ymax + 1);
-//            {//Small test by lochappy
-//                std::cout << "integral_neg_view_diff = " << std::abs(integral_neg_view_cv - integral_neg_view) <<std::endl;
-//            }
-//            scalar_t average_diff_givpre = average_diff +           integral_neg - 2 * integral_neg_view;
-//            scalar_t average_diff_givabs = average_diff + lambda * (integral_neg - 2 * integral_neg_view);
-
-//            scalar_t log_mu0 = global_difference.log_proba(average_diff_givabs / average_surface_givabs);
-//            scalar_t log_mu1 = global_difference.log_proba(average_diff_givpre / average_surface_givpre);
-
-//            (*sum)[i] += log_mu1 - log_mu0;
-
-//        }
-//    }
-//}
 
 void POMSolver::solve(Room *room,
                       Vector<scalar_t> *prior,
@@ -171,10 +103,7 @@ void POMSolver::solve(Room *room,
 
 
     cv::Mat m_prior(1,prior->length(),CV_64FC1,prior->data());
-
-    Vector<scalar_t> log_prior_ratio(prior->length());
-    Vector<scalar_t> sum(room->nb_positions());
-    Vector<scalar_t> proba_absence(room->nb_positions());
+    cv::Mat m_result_proba_presence(1,result_proba_presence->length(),CV_64FC1,result_proba_presence->data());
 
     cv::Mat m_log_prior_ratio(1,prior->length(),CV_64FC1);
     cv::Mat m_sum(1,room->nb_positions(),CV_64FC1);
@@ -184,43 +113,28 @@ void POMSolver::solve(Room *room,
     cv::log(m_prior/(1.0 - m_prior),m_log_prior_ratio);
     m_proba_absence = 1.0 - m_prior;
 
-    for(int i  = 0; i < room->nb_positions(); i++) {
-        log_prior_ratio[i] = log((*prior)[i]/(1 - (*prior)[i]));
-        proba_absence[i] = 1 - (*prior)[i];
-    }
-
-//    {//Small test by lochappy
-//        double log_prior_ratio_diff=0,proba_absence_diff = 0;
-//        for(int i  = 0; i < room->nb_positions(); i++) {
-//            log_prior_ratio_diff += std::abs(m_log_prior_ratio.at<double>(0,i) - log_prior_ratio[i]);
-//            proba_absence_diff += std::abs(m_proba_absence.at<double>(0,i) - proba_absence[i]);
-//        }
-//        std::cout<< "log_prior_ratio_diff = " << log_prior_ratio_diff
-//                 << "; proba_absence_diff = " << proba_absence_diff << std::endl <<std::flush;
-//    }
-
     int nb_stab = 0;
 
     for(int it = 0; (nb_stab < global_nb_stable_error_for_convergence) && (it < global_max_nb_solver_iterations); it++) {
 
-        sum.clear();
+        m_sum.setTo(0.0);
         for(int c = 0; c < room->nb_cameras(); c++)
-            add_log_ratio(c, room, &proba_absence, &sum);
+            add_log_ratio(c, room, m_proba_absence, m_sum);
 
-        scalar_t e = 0;
-        for(int i = 0; i < room->nb_positions(); i++) {
-            scalar_t np = global_smoothing_coefficient * proba_absence[i] +
-                    (1 - global_smoothing_coefficient) / (1 + exp(log_prior_ratio[i] + sum[i]));
-            if(abs(proba_absence[i] - np) > e) e = abs(proba_absence[i] - np);
-            proba_absence[i] = np;
-        }
+        cv::Mat m_exp, m_err;
+        cv::exp(m_log_prior_ratio+m_sum,m_exp);
+        cv::Mat m_np = global_smoothing_coefficient*m_proba_absence + (1-global_smoothing_coefficient)/(1+m_exp);
+        cv::absdiff(m_np,m_proba_absence,m_err);
+        m_proba_absence = m_np;
 
-        if(e < global_error_max) nb_stab++; else nb_stab = 0;
+        double e_max=0;
+        cv::minMaxIdx(m_err,NULL,&e_max);
+        if(e_max < global_error_max) nb_stab++; else nb_stab = 0;
 
         if(convergence_file_format) {
             char buffer[buffer_size];
             for(int p = 0; p < room->nb_positions(); p++) {
-                (*result_proba_presence)[p] = 1 - proba_absence[p];
+                m_result_proba_presence = 1 - m_proba_absence;
             }
 
             for(int c = 0; c < room->nb_cameras(); c++) {
@@ -232,7 +146,5 @@ void POMSolver::solve(Room *room,
 
     }
 
-    for(int p = 0; p < room->nb_positions(); p++) {
-        (*result_proba_presence)[p] = 1 - proba_absence[p];
-    }
+    m_result_proba_presence = 1 - m_proba_absence;
 }
